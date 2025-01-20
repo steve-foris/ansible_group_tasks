@@ -1,0 +1,4 @@
+---
+
+- name: post_task testing
+  shell: echo "post_task at $(date)" > /tmp/post_task.$(date +%F@%H:%M:%S)

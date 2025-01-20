@@ -1,0 +1,3 @@
+---
+- name: pre_task testing
+  shell: echo "pre_task at $(date)" > /tmp/pre_task.$(date +%F@%H:%M:%S)

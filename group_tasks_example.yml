@@ -1,0 +1,37 @@
+---
+#This is an example playbook of implementing a group_tasks feature which would be nice to 
+#see in ansible proper
+
+- name: group tasks example
+  hosts: all
+
+    - name: detect pre_tasks
+      shell: find ./group_tasks/ -name pre_tasks.yml | cut -d'/' -f 3
+      register: hg_find
+      delegate_to: localhost
+      tags: pre_patch
+      when: not targeted_patches
+      become: no
+
+    - name: handle pre_tasks
+      include_tasks: "group_tasks/{{ host_group }}/pre_tasks.yml"
+      loop: "{{ hg_find.stdout_lines }}"
+      loop_control:
+        loop_var: host_group
+      ignore_errors: yes
+      when: host_group in group_names 
+      tags: pre_patch
+
+    - name: detect post_tasks
+      shell: find ./group_tasks/ -name post_tasks.yml | cut -d'/' -f 3
+      register: hg_find
+      delegate_to: localhost
+
+    - name: handle post_tasks
+      include_tasks: "group_tasks/{{ host_group }}/post_tasks.yml"
+      loop: "{{ hg_find.stdout_lines }}"
+      loop_control:
+        loop_var: host_group
+      ignore_errors: yes
+      when: host_group in group_names
+
